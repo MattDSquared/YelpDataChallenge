@@ -1,0 +1,53 @@
+
+
+```{r, packages}
+# =============================================================================
+# Download data files
+# downloads binary .zip file from https:// on windows machine
+# unzips the file and returns file names of the unzipped files
+# doesn't download the file if it already exists, but does overwrite unzipped
+# files.
+# =============================================================================
+load <- function(pkg){
+    new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+    if (length(new.pkg))
+        install.packages(new.pkg, dependencies = TRUE)
+    sapply(pkg, require, character.only = TRUE)
+} 
+
+packages <- c("data.table", "caret", "randomForest", "foreach", "rpart", 
+              "rpart.plot", "doParallel", "corrplot")
+load(packages)
+```
+
+```{r download}
+# =============================================================================
+# Download data files
+# downloads binary .zip file from https:// on windows machine
+# unzips the file and returns file names of the unzipped files
+# doesn't download the file if it already exists, but does overwrite unzipped
+# files.
+# =============================================================================
+dldata <- function(dlfilepath, dlfilename, dataURL){
+    
+    dlfilepath = file.path(getwd(),dlfilepath)
+    dlfullfilename = file.path(dlfilepath, dlfilename)
+    
+    dir.create(dlfilepath, showWarnings = FALSE)
+    
+    if (!file.exists(dlfullfilename)){ 
+        # set browser to download file through IE protocol (for https)
+        setInternet2(use = TRUE)
+        download.file(dataURL, destfile = dlfullfilename, mode="wb")
+    } else {
+        message("Using previously downloaded data.")
+    }
+    
+    # unzip, overwrites data
+    message("Unzipping original zip file...")
+    unzip(dlfullfilename,exdir = dlfilepath)
+}
+
+dldata("data","yelp_dataset_challenge_academic_dataset.zip",
+       "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/yelp_dataset_challenge_academic_dataset.zip")
+```
